@@ -13,7 +13,9 @@ members = [
         # Лёгкий вход ADMIN
         'username': 'a',
         'password': 'a',
-        'role': 'admin'
+        'role': 'admin',
+        'taken_books': [],
+        'history': []
     },
     {
         'username': 'Oleg',
@@ -32,18 +34,11 @@ members = [
     {
         'username': 'Admin',
         'password': 'ReallyHardPassword',
-        'role': 'admin'
+        'role': 'admin',
+        'taken_books': [],
+        'history': []
     }
 ]
-
-
-
-clients = [{'name': 'Dmitriy',
-            'username': '123',
-            'role' : 'client',
-            'taken_books': ['joker', 'joper'],
-            'history': ['joker', 'joper', 'jojo']
-            }]
 
 books = [
     {
@@ -296,94 +291,77 @@ books = [
     }
 ]
 
-dict_of_arguments_books = {
-    'название': 'title',
-    'автор': 'author',
-    'жанр': 'genre',
-    'рейтинг': 'rating',
-    'дата публикации': 'date',
-    'дата книги': 'book_date'
+dict_of_arguments_members = {
+    '1': 'username',
+    '2': 'password',
+    '3': 'role',
+    '4': 'taken_books',
+    '5': 'history'
 }
 
-dict_of_arguments_users = {
-    'имя': 'username',
-    'пароль': 'password',
-    'взятые книги': 'taken_books',
-    'история': 'history'
+dict_of_arguments_books = {
+    '1': 'title',
+    '2': 'author',
+    '3': 'genre',
+    '4': 'rating',
+    '5': 'date',
+    '6': 'book_date'
 }
 
 user_search_dict = {
     '1': 'title',
     '2': 'author',
     '3': 'genre',
-    '4': 'date'
 }
+
 def start_menu():
-    print(f'\t\tДобро пожаловать в сеть библиотеки!\n'
+    print(f'{separator}\n\t\tДобро пожаловать в сеть библиотеки!\n'
           f'\tВведите ниже свои данные в формате username:password\n'
           f'\t\t\tПример - User:User password\n'
           f'{separator}')
     enter = input().split(':')
     if len(enter) != 2:
-        print(f'Вы ввели данные в неправильном формате, просьба ввести их в формате username:password\n{separator}')
+        print('Вы ввели данные в неправильном формате, просьба ввести их в формате username:password')
         return start_menu()
     for member in members:
-        if (enter[0] == member['username']) and (enter[1] == member['password']):
-            print(f'Вход успешен!\n{separator}')
+        if enter[0] == member['username'] and enter[1] == member['password']:
+            print('Вход успешен!')
             if member['role'] == 'user':
                 return user_menu(member=member)
-            else:
-                return admin_menu(member=member)
-    print(f'Введено неправильное имя пользователя или пароль\n{separator}')
+            return admin_menu(member=member)
+    print('Логин или пароль неправильный!')
     return start_menu()
 
-def user_menu(member=None):
-    print(f'Добро пожаловать - {member['username']}!\n'
+def user_menu(member):
+    print(f'\n{separator}\nДобро пожаловать - {member['username']}!\n'
           f'Выберите действие:\n'
           f'1. Посмотреть каталог книг\n'
           f'2. Найти книгу по названию\n'
-          f'3. Найти книгу по жанру\n'
-          f'4. Найти книгу по автору\n'
-          f'5. Посмотреть книги по рейтингу.\n'
-          f'6. Посмотреть взятые книги\n'
-          f'7. Посмотреть историю\n'
-          f'8. Изменить пароль аккаунта\n'
-          f'9. Выход')
+          f'3. Найти книгу по автору\n'
+          f'4. Найти книгу по жанру\n'
+          f'5. Сортировка книг по рейтингу.\n'
+          f'6. Посмотреть свой аккаунт\n'
+          f'7. Изменить пароль аккаунта\n'
+          f'8. Выход')
     user_input = input('>>> ')
-    if user_input == "1":
-        print("\n".join(list(map(info, books))))
-    elif user_input == "2":
-        search('title')
-    elif user_input == "3":
-        search('genre')
-    elif user_input == "4":
-        search('author')
-    elif user_input == "5":
-        sort_rating()
-    elif user_input == "6":
-        print(separator, f'\nВаши взятые книги:\n{'\n'.join(member["taken_books"])}')
-    elif user_input == "7":
-        print(separator, f'\nВаши история:\n{'\n'.join(member["history"])}')
-    elif user_input == '8':
-        change_password(member)
-        print('Введите старый и новый пароли в формате old_password:new_password\n\t\tНовый пароль должен содержать минимум 3 символа')
-        enter = input().split(':')
-        if len(enter) != 2:
-            print('Пожалуйста введите пароли в формате old_password:new_password')
-        elif enter[0] == enter[1]:
-            print('Новый пароль не должен совпадать со старым!')
-        elif len(enter[1]) < 3:
-            print('Длина нового пароля должна быть больше 3')
-        elif enter[0] in member['password']:
-            member['password'] = enter[1]
-    elif user_input == "9":
-        return start_menu()
+    if user_input in user_commands:
+        if user_input == '2':
+            user_commands[user_input]('title')
+        elif user_input == '3':
+            user_commands[user_input]('author')
+        elif user_input == '4':
+            user_commands[user_input]('genre')
+        elif user_input in ['6', '7']:
+            user_commands[user_input](member)
+        else:
+            user_commands[user_input]()
     else:
-        print('Вы ввели некорректную команду, просьба ввести цифру\n')
-    return user_menu(member=member)
+        print('Данной команды нет в списке!')
+    user_menu(member=member)
 
-def admin_menu(member=None):
-    print(f'Добро пожаловать - {member['username']}!\n'
+
+def admin_menu(member):
+    print(f'\n{separator}\nДобро пожаловать - {member['username']}!\n'
           f'Выберите действие:\n'
           f'1. Посмотреть каталог книг\n'
           f'2. Посмотреть список клиентов\n'
@@ -394,201 +372,171 @@ def admin_menu(member=None):
           f'7. Изменить пароль\n'
           f'8. Выход')
     user_input = input('>>> ')
-    if user_input == '1':
-        print("".join(list(map(info, books))))
-    elif user_input == '2':
-        print('\n\n'.join(list(map(user_info, filter(lambda x: x, members)))))
-    elif user_input == '3':
-        user_search = input('Введите название книги, которую хотите изменить\n>>>')
-        edit_book_menu(user_search)
-    elif user_input == '4':
-        user_search = input('Введите имя пользователя, которого хотите изменить\n>>>')
-        edit_user_menu(user_search)
-    elif user_input == '5':
-        add_object('book')
-    elif user_input == '6':
-        add_object('user')
-    elif user_input == '7':
-        change_password(member)
-    elif user_input == '8':
-        start_menu()
-    return admin_menu(member)
+    if user_input in admin_commands:
+        if user_input in ['3', '5']:
+            admin_commands[user_input]('book')
+        elif user_input == '4':
+            admin_commands[user_input]('member', member)
+        elif user_input == '6':
+            admin_commands[user_input]('member')
+        elif user_input == '7':
+            change_password(member=member)
 
-def add_object(object_):
-    if object_ == 'book':
-        books.append({'title': input('Введите название книги\n>>>'), 'author': input('Введите автора\n>>>'),
-                      'genre': input('Введите жанр\n>>>'), 'rating': input('Введите жанр\n>>>'),
-                      'date': input('Введите год написания книги\n>>>'), 'book_date': input('Введите год выпуска книги\n>>>')})
-        return
-    members.append({'username': input('Введите имя пользователя\n>>>'), 'password': input('Введите пароль пользователя\n>>>'),
-                    'role': 'admin' if input('Напишите "+" если хотите добавить админа, ничего, если пользователя') == '+' else 'user',
-                    'taken_books': [], 'history': []})
-
-def edit_user_menu(user_username):
-    selected_user = list(map(lambda user: user, filter(lambda user: user_username.lower() in user['username'] and user['role'] != 'admin', members)))
-    if len(selected_user) > 1:
-        print(f'По вашему запросу, нашлось больше 1 пользователя:\n{"\n".join(list(map(lambda user: user['username'], selected_user)))}\n---\nПросьба более точно ввести имя пользователя')
-        return
-    elif not selected_user:
-        print('Вы не можете изменить данные у пользователя типа Admin!')
-        return
-    print(selected_user[0]['username'])
-    user_choice = input('Это тот пользователь, которого вы хотите изменить y/n | д/н\n>>>')
-    if user_choice in ['n', 'н']:
-        return
-    selected_user = selected_user[0]
-    user_choice = input(f'Выберите параметр, который хотите изменить:\n{user_info(selected_user)}\n>>>').lower()
-    if user_choice.strip() in dict_of_arguments_users.keys():
-        edit_user(dict_of_arguments_users[user_choice.strip()], selected_user['username'])
-
-
-def edit_user(argument, user_username):
-    if argument == 'username':
-        print('Введите новое имя пользователя')
-    elif argument == 'password':
-        print('Введите новый пароль')
-    elif argument == 'taken_books':
-        user_choice = input('1. Добавить\n2. Убрать\n3. Очистить взятые книги?\n>>>').strip()
-        if user_choice== '1':
-            add_history('taken_books', user_username)
-            return
-        elif user_choice == '2':
-            remove_history('taken_books', user_username)
-            return
-        elif user_choice == '3':
-            for member in members:
-                if member['username'] == user_username:
-                    member['taken_books'] = []
-                    print('Теперь пользователь выглядит так', separator, user_info(member))
-                    break
         else:
-            print('Такой команды нет!')
-            return
-    elif argument == 'history':
-        user_choice = input('1. Добавить взятую книгу\n2. Убрать взятую книгу\n3. Очистить все взятые книги?\n>>>').strip()
-        if user_choice== '1':
-            add_history('history', user_username)
-            return
-        elif user_choice == '2':
-            remove_history('history', user_username)
-            return
-        elif user_choice == '3':
-            for member in members:
-                if member['username'] == user_username:
-                    member['history'] = []
-                    print('Теперь пользователь выглядит так', separator, user_info(member))
-                    break
-    for member in members:
-        if member['username'] == user_username:
-            member[argument] = input()
-            print('Теперь пользователь выглядит так', separator, user_info(member))
-            return
+            admin_commands[user_input]()
+    admin_menu(member=member)
 
-def add_history(argument, user_username):
-    for member in members:
-        if member['username'] == user_username:
-            print(f'Введите название книги')
-            member[argument].append(input('>>>'))
-            print('Теперь пользователь выглядит так', separator, user_info(member))
-            return
 
-def remove_history(argument, user_username):
-    for member in members:
-        if member['username'] == user_username:
-            print(f'Введите номер того параметра, который хотите удалить:\n{'\n'.join(f"{i + 1} - {arg}" for i, arg in enumerate(member[argument]))}')
-            user_choice = input()
-            member[argument].pop(int(user_choice) - 1) if user_choice.isdigit() else print('Вы ввели не число!')
-            print('Теперь пользователь выглядит так', separator, user_info(member))
-            return
-
-def sort_rating():
-    user_search = input('Выберите, по какому  критерию будет поиск по рейтингу:\n'
-                        '1. По названию\n'
-                        '2. По автору\n'
-                        '3. Без фильтра\n'
-                        '>>>')
-    if user_search in ['1', '2']:
-        print(''.join(list(map(info, sorted(search(user_search_dict[user_search], do_print=False),
-                                                               key=lambda book: book['rating'], reverse=True)))))
-    elif user_search == '3':
-        print(''.join(list((map(info, sorted(books, key=lambda book: book['rating'], reverse=True))))))
-    else:
-        print('Нет такой команды!')
-
-def edit_book_menu(book_title):
-    selected_book = list(map(lambda book: book, filter(lambda book: book_title.lower() in book['title'].lower(), books)))
-    if len(selected_book) > 1:
-        print(f'По вашему запросу нашлось больше 1 книги:\n{'\n'.join(list(map(lambda book: book['title'], selected_book)))}\n---\nПросьба более точно ввести название книги')
-        return
-    elif not selected_book:
-        print('По вашему запросу не нашлось пользователей')
-        return
-    print(selected_book[0]['title'])
-    user_choice = input('Эта та книга, которую вы хотите изменить y/n | д/н\n>>>')
-    if user_choice in ['n', 'н']:
-        return
-    selected_book = selected_book[0]
-    user_choice = input(f"Выберите параметры, которые хотите изменить:\n{info(selected_book)}\n>>>").lower()
-    if user_choice.strip() in dict_of_arguments_books.keys():
-        edit_book(dict_of_arguments_books[user_choice.strip()], selected_book['title'])
-    else:
-        print('Такого параметра нет у книги!', separator, sep='\n')
-
-def edit_book(argument, book_title):
+def search_books(argument, do_print=True):
     if argument == 'title':
-        print('Введите новое название книги')
+        user_input = input('Введите название книги\n').lower().strip()
     elif argument == 'author':
-        print('Введите нового автора книги')
-    elif argument == 'genre':
-        print('Введите новый жанр книги')
-    elif argument == 'rating':
-        print('Введите новый рейтинг книги')
-    elif argument == 'date':
-        print('Введите новую дату публикации книги')
-    elif argument == 'book_date':
-        print('Введите новую дату книги')
-    for book in books:
-        if book['title'] == book_title:
-            book[argument] = input()
-            print('Теперь книга выглядит так:', separator, info(book),  sep='\n')
-            return
+        user_input = input('Введите имя автора\n').lower().strip()
+    else:
+        user_input = input('Введите жанр книги\n').lower().strip()
+    if not do_print:
+        return list(filter(lambda book: user_input in book[argument].lower(), books))
+    print_books(list_of_books=(list(filter(lambda book: user_input in book[argument].lower(), books))))
+
+def sort_books():
+    user_input = input('Введите номер того, по какому критерию сделать фильтрацию:\n1. Название\n2. Автор\n3. Жанр\n')
+    if user_input not in user_search_dict.keys():
+        print('Вы ввели некорректное значение')
+        return
+    user_input = user_search_dict[user_input]
+    print_books(list_of_books=(list(sorted(search_books(user_input, do_print=False), key=lambda book: book['rating'], reverse=True))))
 
 def change_password(member):
-    print('Введите старый и новый пароли в формате old_password:new_password\n\t\tНовый пароль должен содержать минимум 3 символа')
-    enter = input().split(':')
-    if len(enter) != 2:
-        print('Пожалуйста введите пароли в формате old_password:new_password без использования знака ":" в пароле!')
-    elif enter[0] == enter[1]:
-        print('Новый пароль не должен совпадать со старым!')
-    elif len(enter[1]) < 3:
-        print('Длина нового пароля должна быть больше 3')
-    elif enter[0] in member['password']:
-        member['password'] = enter[1]
-        return
-    return change_password(member=member)
+    new_password = input('Введите новый пароль: ')
+    if ':' in new_password:
+        print('В пароле не может содержать знак ":"')
+        return change_password(member=member)
+    member['password'] = new_password
 
-def search(argument, do_print=True):
-    if argument == 'title':
-        user_search = input('Введите названия книг через запятую\n>>>').lower().replace(', ', ',').split(',')
-    elif argument == 'author':
-        user_search = input('Введите имена авторов через запятую\n>>>').lower().replace(', ', ',').split(',')
-    elif argument == 'genre':
-        user_search = input('Введите названия жанров через запятую\n>>>').lower().replace(', ', ',').split(',')
-    if do_print:
-        print(f'---' * 24,
-              ''.join(list(map(info, filter(lambda book: any(search_argument.strip() in book[argument].lower() for search_argument in user_search), books)))), sep="\n")
-    return list(filter(lambda book: any(search_argument.strip() in book[argument].lower() for search_argument in user_search), books))
+def print_members():
+    print('\n'.join(list(map(lambda member: f'\nUsername - {member['username']}\nПароль - {member['password']}\nРоль - {member['role']}\n'
+          f'Взятые книги - {member['taken_books']}\nИстория - {member['history']}', members))))
 
-def info(book):
-    return f'Название - {book['title']}\nАвтор - {book['author']}\nЖанр - {book['genre']}\nРейтинг - {book['rating']}\nДата публикации - {book['date']}\nДата книги - {book['book_date']}\n{separator}\n'
+def print_member(member):
+    print(f'\nUsername - {member['username']}\nПароль - {member['password']}\nРоль - {member['role']}\n'
+          f'Взятые книги - {member['taken_books']}\nИстория - {member['history']}')
 
-def user_info(user):
-    if user['role'] == 'user':
-        return (f'Имя - {user['username']}\nРоль - {user['role']}\nПароль - {user['password']}\n'
-                f'Взятые книги {user['taken_books']}\n'
-                f'История пользователя - {user['history']}')
-    return f'Имя - {user['username']}\nРоль - {user['role']}'
+def print_books(list_of_books=books):
+    print('\n\n'.join(list(map(lambda book: f'Название - {book['title']}\nАвтор - {book['author']}\nЖанр - {book['genre']}\n'
+                                            f'Рейтинг - {book['rating']}\nГод публикации произведения - {book['date']}\n'
+                                            f'Год создания книги - {book['book_date']}', list_of_books))))
 
+def print_book(book):
+    print(f'Название - {book['title']}\nАвтор - {book['author']}\nЖанр - {book['genre']}\n'
+                                            f'Рейтинг - {book['rating']}\nГод публикации произведения - {book['date']}\n'
+                                            f'Год создания книги - {book['book_date']}')
+
+def add_thing(thing):
+    if thing == 'book':
+        try:
+            books.append({'title': input('Введите название книги: ').strip(), 'author': input('Введите имя автора: ').strip(), 'genre': input('Введите жанр книги: ').strip(),
+                          'rating': float(input('Введите рейтинг книги: ')), 'date': int(input('Введите год публикации произведения: ')),
+                          'book_date': int(input('Введите год создания книги: '))})
+        except ValueError:
+            print('Вы ввели не число!')
+        print('Книга успешно добавлена!')
+    if thing == 'member':
+        new_username = input('Введите username пользователя: ').strip()
+        for member in members:
+            if new_username == member['username']:
+                print('Пользователь с таким username уже существует!')
+                return
+        members.append({'username': input('Введите username пользователя: ').strip(), 'password': input('Введите пароль пользователя: ').strip(),
+                        'role': 'admin' if input('Введите + чтобы добавить админа').strip() == '+' else 'user', 'taken_books': [],
+                        'history': []})
+        print('Пользователь успешно добавлен!')
+
+def edit_thing(thing, current_member):
+    if thing == 'book':
+        user_input = input('Введите название книги, которую хотите изменить: ').lower().strip()
+        for book in books:
+            if user_input == book['title'].lower():
+                print_book(book)
+                user_input = input('Какое значение книги вы хотите изменить?\n1. Название\n2. Автор\n3. Жанр\n4. Рейтинг\n5. Год публикации\n6. Год создания книги\n')
+                if user_input in dict_of_arguments_books.keys():
+                    if user_input == '1':
+                        book[dict_of_arguments_books[user_input]] = input('Введите название книги: ')
+                    elif user_input == '2':
+                        book[dict_of_arguments_books[user_input]] = input('Введите имя автора книги: ')
+                    elif user_input == '3':
+                        book[dict_of_arguments_books[user_input]] = input('Введите жанр книги: ')
+                    elif user_input == '4':
+                        book[dict_of_arguments_books[user_input]] = float(input('Введите рейтинг книги: '))
+                    elif user_input == '5':
+                        book[dict_of_arguments_books[user_input]] = int(input('Введите год публикации произведения: '))
+                    else:
+                        book[dict_of_arguments_books[user_input]] = int(input('Введите год создания книги: '))
+                    return
+                else:
+                    print('Вы ввели несуществующую команду')
+                    return
+        print('такой книги нет в списке книг!')
+    if thing == 'member':
+        user_input = input('Введите username пользователя, которого хотите изменить: ').strip()
+        for member in members:
+            if user_input == member['username'].lower():
+                if user_input == current_member['username']:
+                    print('Вы не можете изменить себя')
+                    return
+                print_member(member)
+                user_input = input('Какое значение пользователя вы хотите изменить?\n1. Username\n2. Пароль\n3. Роль\n'
+                                   '4. Взятые книги\n5. История')
+                if user_input in dict_of_arguments_members.keys():
+                    if user_input == '1':
+                        element = input('Введите новый username, не используя знак ":": ')
+                        if ':' in user_input:
+                            print('Новый username содержит знак ":"')
+                            return
+                        member[dict_of_arguments_members[user_input]] = element
+                    elif user_input == '2':
+                        element = input('Введите новый пароль, не используя знак ":": ')
+                        if ':' in user_input:
+                            print('Новый username содержит знак ":"')
+                            return
+                        member[dict_of_arguments_members[user_input]] = element
+                    elif user_input == '3':
+                        member[dict_of_arguments_members[user_input]] = 'admin' if input('Введите + если хотите изменить роль на admin: ') == '+' else 'user'
+                    elif user_input == '4':
+                        elements = input('Введите книги, которые хотите добавить во взятые книги через запятую: ').split(', ')
+                        for element in elements:
+                            member[dict_of_arguments_members[user_input]].append(element)
+                        return
+                    elif user_input == '5':
+                        elements = input('Введите книги, которые вы хотите добавить в историю через запятую: ')
+                        for element in elements:
+                            member[dict_of_arguments_members[user_input]].append(element)
+                    return
+                else:
+                    print('Вы ввели несуществующую команду!')
+                    return
+        print('Такого пользователя нет в списке')
+
+user_commands = {
+    '1': print_books,
+    '2': lambda argument: search_books(argument),
+    '3': lambda argument: search_books(argument),
+    '4': lambda argument: search_books(argument),
+    '5': sort_books,
+    '6': lambda member: print_member(member),
+    '7': lambda member: change_password(member),
+    '8': start_menu
+}
+
+admin_commands = {
+    '1': print_books,
+    '2': print_members,
+    '3': lambda thing: edit_thing(thing, None),
+    '4': lambda thing, member: edit_thing(thing, member),
+    '5': lambda thing: add_thing(thing),
+    '6': lambda thing: add_thing(thing),
+    '7': lambda member: change_password(member),
+    '8': start_menu
+}
 
 if __name__ == '__main__':
     start_menu()
